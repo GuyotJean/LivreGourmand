@@ -8,3 +8,5 @@ export const db = await mysql.createPool({
   password: process.env.DB_PASS || '',
   database: process.env.DB_NAME || 'livre_gourmand'
 });
+
+export default db;

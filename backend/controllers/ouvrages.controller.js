@@ -14,7 +14,7 @@ export const getOuvrages = async (req, res) => {
       FROM ouvrages o
       LEFT JOIN avis a ON a.ouvrage_id = o.id
     `;
-    let conditions = [];
+    let conditions = ["o.stock > 0"]; // Verificação de stock > 0
     let params = [];
 
     if (search) {
@@ -29,12 +29,14 @@ export const getOuvrages = async (req, res) => {
       params.push(categorie);
     }
 
+    // Adiciona condições ao WHERE
     if (conditions.length > 0) {
       query += ` WHERE ` + conditions.join(" AND ");
     }
 
     query += ` GROUP BY o.id`;
 
+    // Ordenação
     if (order === "popularite") {
       query += ` ORDER BY nb_avis DESC`;
     } else {
@@ -48,6 +50,7 @@ export const getOuvrages = async (req, res) => {
     res.status(500).json({ message: "Erreur serveur" });
   }
 };
+
 
 /**
  * Détail d'un ouvrage

@@ -38,8 +38,40 @@ export const addItem = async (req, res) => {
   const { ouvrage_id, quantite } = req.body;
   const clientId = req.user.id;
 
+  const connection = await db.getConnection();
+
   try {
-    let [panierRows] = await db.query(
+    await connection.beginTransaction();
+
+    // Vérifier le stock disponible
+    const [stockRows] = await connection.query(
+      `SELECT stock, prix, titre FROM ouvrages WHERE id = ? FOR UPDATE`,
+      [ouvrage_id]
+    );
+
+    if (stockRows.length === 0) {
+      await connection.rollback();
+      return res.status(404).json({ message: "Ouvrage non trouvé" });
+    }
+
+    const ouvrage = stockRows[0];
+
+    if (ouvrage.stock <= 0) {
+      await connection.rollback();
+      return res
+        .status(400)
+        .json({ message: `Aucun stock disponible` });
+    }
+
+    if (ouvrage.stock < quantite) {
+      await connection.rollback();
+      return res.status(400).json({
+        message: `Stock insuffisant pour "${ouvrage.titre}" (disponible: ${ouvrage.stock})`,
+      });
+    }
+
+    // Créer ou récupérer le panier actif
+    let [panierRows] = await connection.query(
       `SELECT id FROM panier WHERE client_id = ? AND actif = 1`,
       [clientId]
     );
@@ -48,43 +80,56 @@ export const addItem = async (req, res) => {
     if (panierRows.length > 0) {
       panierId = panierRows[0].id;
     } else {
-      const [result] = await db.query(
+      const [result] = await connection.query(
         `INSERT INTO panier (client_id) VALUES (?)`,
         [clientId]
       );
       panierId = result.insertId;
     }
 
-    const [exist] = await db.query(
+    // Vérifier si l'article existe déjà dans le panier
+    const [exist] = await connection.query(
       `SELECT id, quantite FROM panier_items WHERE panier_id = ? AND ouvrage_id = ?`,
       [panierId, ouvrage_id]
     );
 
     if (exist.length > 0) {
-      await db.query(
-        `UPDATE panier_items SET quantite = quantite + ? WHERE id = ?`,
-        [quantite, exist[0].id]
+      const nouvelleQuantite = exist[0].quantite + quantite;
+
+      // Vérifier que la nouvelle quantité ne dépasse pas le stock
+      if (nouvelleQuantite > ouvrage.stock) {
+        await connection.rollback();
+        return res.status(400).json({
+          message: `Impossible d’ajouter ${quantite} exemplaires — seulement ${ouvrage.stock} disponibles.`,
+        });
+      }
+
+      await connection.query(
+        `UPDATE panier_items SET quantite = ? WHERE id = ?`,
+        [nouvelleQuantite, exist[0].id]
       );
     } else {
-      const [ouvrageRows] = await db.query(
-        `SELECT prix FROM ouvrages WHERE id = ?`,
-        [ouvrage_id]
-      );
-      if (ouvrageRows.length === 0)
-        return res.status(404).json({ message: "Ouvrage non trouvé" });
-      const prix = ouvrageRows[0].prix;
-
-      await db.query(
+      await connection.query(
         `INSERT INTO panier_items (panier_id, ouvrage_id, quantite, prix_unitaire)
          VALUES (?, ?, ?, ?)`,
-        [panierId, ouvrage_id, quantite, prix]
+        [panierId, ouvrage_id, quantite, ouvrage.prix]
       );
     }
 
+    // Décrémenter le stock
+    await connection.query(
+      `UPDATE ouvrages SET stock = stock - ? WHERE id = ?`,
+      [quantite, ouvrage_id]
+    );
+
+    await connection.commit();
     res.status(201).json({ message: "Article ajouté au panier" });
   } catch (err) {
     console.error(err);
+    await connection.rollback();
     res.status(500).json({ message: "Erreur serveur" });
+  } finally {
+    connection.release();
   }
 };
 

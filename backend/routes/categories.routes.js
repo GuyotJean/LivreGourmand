@@ -7,8 +7,17 @@ import {
   updateCategory,
   deleteCategory,
 } from '../controllers/categories.controller.js';
+import { createCategoryValidator } from "../validators/validators.js";
+import { validationResult } from 'express-validator';
 
 const router = express.Router();
+
+// Middleware générique pour gérer les erreurs de validation
+const handleValidation = (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+  next();
+};
 
 // GET /api/categories
 router.get('/', getAllCategories);
@@ -18,6 +27,8 @@ router.post(
   '/',
   verifyToken,
   authorizeRole(['editeur', 'gestionnaire', 'administrateur']),
+  createCategoryValidator,
+  handleValidation,
   createCategory
 );
 
@@ -26,6 +37,8 @@ router.put(
   '/:id',
   verifyToken,
   authorizeRole(['editeur', 'gestionnaire', 'administrateur']),
+  createCategoryValidator,
+  handleValidation,
   updateCategory
 );
 

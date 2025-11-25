@@ -8,7 +8,7 @@ export default function ChatBox() {
 
   const messagesEndRef = useRef(null);
 
-  // Scroll automatically
+  // Défilement automatique
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
@@ -17,28 +17,28 @@ export default function ChatBox() {
     const trimmedInput = input.trim();
     if (!trimmedInput) return;
 
-    // Ajoute message
+    // Ajouter le message
     setMessages((prev) => [...prev, { from: "user", text: trimmedInput }]);
     setInput("");
 
-    // Loading
-    const loadingMessage = { from: "ai", text: "Loading..." };
+    // Chargement
+    const loadingMessage = { from: "ai", text: "Chargement..." };
     setMessages((prev) => [...prev, loadingMessage]);
 
     try {
       const { reply } = await sendMessageAPI(trimmedInput);
 
-      // Change loading
+      // Remplacer le message de chargement
       setMessages((prev) =>
         prev.map((m) =>
           m === loadingMessage ? { from: "ai", text: reply } : m
         )
       );
     } catch (err) {
-      console.error("Error:", err);
+      console.error("Erreur:", err);
       setMessages((prev) =>
         prev.map((m) =>
-          m === loadingMessage ? { from: "ai", text: "Error" } : m
+          m === loadingMessage ? { from: "ai", text: "Erreur" } : m
         )
       );
     }
@@ -121,7 +121,7 @@ export default function ChatBox() {
                     display: "inline-block",
                     maxWidth: "80%",
                     wordBreak: "break-word",
-                    fontStyle: m.text === "Thinking..." ? "italic" : "normal",
+                    fontStyle: m.text === "Chargement..." ? "italic" : "normal",
                   }}
                 >
                   {m.text}

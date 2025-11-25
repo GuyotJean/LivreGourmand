@@ -14,9 +14,14 @@ export default function Header() {
       <div className="container">
         <h1 className="navbar-brand fw-bold m-0">
           <Link to="/" className="text-decoration-none">
-            LivresGourmands
+            <img
+              src="/logo.png"
+              alt="Logo Livres Gourmands"
+            // style={{ width: "140px", height: "60px" }}
+            />
           </Link>
         </h1>
+
         <button
           className="navbar-toggler"
           type="button"
@@ -59,11 +64,18 @@ export default function Header() {
 
           <ul className="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
             <li className="nav-item me-3">
-              <NavLink to="/cart" className="nav-link">
-                <strong>MON PANIER</strong> {count} article(s){" "}
-                {total.toFixed(2)} $
+              <NavLink to="/cart" className="nav-link d-flex align-items-center">
+                <img
+                  src="/cart-icon.png"
+                  alt="Panier"
+                  style={{ height: "24px", marginRight: "8px" }}
+                />
+                <span>
+                  {count} article(s) - {total.toFixed(2)} $
+                </span>
               </NavLink>
             </li>
+
             {user ? (
               <li className="nav-item">
                 <button className="btn btn-outline-secondary" onClick={signout}>

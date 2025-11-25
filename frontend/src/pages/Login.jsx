@@ -16,7 +16,7 @@ export default function Login() {
       await signin(email, password)
       nav('/')
     } catch (err) {
-      alert(err?.response?.data?.message || 'Login failed')
+      alert(err?.response?.data?.message || 'Échec de la connexion')
     } finally {
       setLoading(false)
     }
@@ -30,24 +30,24 @@ export default function Login() {
           <form onSubmit={handleSubmit} className="card p-4">
             <div className="mb-3">
               <label className="form-label">Login</label>
-              <input 
+              <input
                 type="email"
-                className="form-control" 
-                value={email} 
-                onChange={e => setEmail(e.target.value)} 
+                className="form-control"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
                 placeholder="Votre email"
-                required 
+                required
               />
             </div>
             <div className="mb-3">
               <label className="form-label">Mot de passe</label>
-              <input 
-                type="password" 
-                className="form-control" 
-                value={password} 
-                onChange={e => setPassword(e.target.value)} 
+              <input
+                type="password"
+                className="form-control"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
                 placeholder="Votre mot de passe"
-                required 
+                required
               />
             </div>
             <button className="btn btn-primary w-100" type="submit" disabled={loading}>

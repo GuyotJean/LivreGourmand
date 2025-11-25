@@ -26,7 +26,7 @@ export default function RechercheAvancee() {
           setCategories(data);
         }
       } catch (e) {
-        console.error("Error fetching categories:", e);
+        console.error("Erreur lors du chargement des catégories:", e);
       }
     };
     fetchCategories();
@@ -41,27 +41,27 @@ export default function RechercheAvancee() {
       setLoading(true);
       // Construire les paramètres de recherche - chaque champ dans son propre champ
       const params = {};
-      
+
       if (filters.titre && filters.titre.trim()) {
         params.titre = filters.titre.trim();
       }
-      
+
       if (filters.auteur && filters.auteur.trim()) {
         params.auteur = filters.auteur.trim();
       }
-      
+
       if (filters.isbn && filters.isbn.trim()) {
         params.isbn = filters.isbn.trim();
       }
-      
+
       if (filters.categorie_id) {
         params.categorie = filters.categorie_id;
       }
-      
+
       // Récupérer les ouvrages correspondants
       const data = await listOuvrages(params);
       let results = Array.isArray(data) ? data : (data?.ouvrages || []);
-      
+
       // Filtrer par prix minimum si fourni (filtrage côté frontend)
       if (filters.prix_min && filters.prix_min.trim()) {
         const prixMin = Number(filters.prix_min);
@@ -69,7 +69,7 @@ export default function RechercheAvancee() {
           results = results.filter(p => Number(p.prix || 0) >= prixMin);
         }
       }
-      
+
       // Filtrer par prix maximum si fourni (filtrage côté frontend)
       if (filters.prix_max && filters.prix_max.trim()) {
         const prixMax = Number(filters.prix_max);
@@ -77,7 +77,7 @@ export default function RechercheAvancee() {
           results = results.filter(p => Number(p.prix || 0) <= prixMax);
         }
       }
-      
+
       setProducts(results);
     } catch (e) {
       console.error("Erreur recherche:", e);
@@ -161,8 +161,8 @@ export default function RechercheAvancee() {
             <button className="btn btn-primary" onClick={handleSearch} disabled={loading}>
               {loading ? "Recherche..." : "Rechercher"}
             </button>
-            <button 
-              className="btn btn-outline-secondary ms-2" 
+            <button
+              className="btn btn-outline-secondary ms-2"
               onClick={() => {
                 setFilters({
                   titre: "",

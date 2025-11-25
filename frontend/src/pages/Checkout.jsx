@@ -7,14 +7,14 @@ import { AuthContext } from '../context/AuthContext'
 import { createCommande, getCommandeById } from '../services/commandeService'
 import { createPaymentIntent, confirmPayment } from '../services/paymentService'
 
-// Inicializar Stripe (usar variável de ambiente ou placeholder)
+// Initialiser Stripe (utiliser une variable d'environnement ou placeholder)
 const stripePublicKey = import.meta.env.VITE_STRIPE_PUBLIC_KEY
 if (!stripePublicKey || stripePublicKey === 'pk_test_placeholder') {
-  console.warn('⚠️ VITE_STRIPE_PUBLIC_KEY não configurada! Configure no arquivo .env')
+  console.warn('⚠️ VITE_STRIPE_PUBLIC_KEY non définie ! Configurez-la dans le fichier .env')
 }
 const stripePromise = stripePublicKey ? loadStripe(stripePublicKey) : null
 
-// Componente de formulário de pagamento
+// Composant de formulaire de paiement
 function CheckoutForm({ commandeId, total, onSuccess }) {
   const stripe = useStripe()
   const elements = useElements()
@@ -25,7 +25,7 @@ function CheckoutForm({ commandeId, total, onSuccess }) {
     e.preventDefault()
 
     if (!stripe || !elements) {
-      setError('Stripe não está inicializado. Verifique se a chave pública está configurada no arquivo .env')
+      setError('Stripe non initialisé. Vérifiez la clé publique dans le fichier .env')
       return
     }
 
@@ -33,16 +33,16 @@ function CheckoutForm({ commandeId, total, onSuccess }) {
       setLoading(true)
       setError(null)
 
-      // Criar PaymentIntent
+      // Créer PaymentIntent
       const { clientSecret, paymentIntentId } = await createPaymentIntent(commandeId)
 
       if (!clientSecret) {
-        setError('Erreur: clientSecret não recebido do servidor. Verifique as chaves do Stripe no backend.')
+        setError('Erreur : clientSecret non reçu du serveur. Vérifiez les clés Stripe dans le backend.')
         setLoading(false)
         return
       }
 
-      // Confirmar pagamento com Stripe
+      // Confirmer le paiement avec Stripe
       const { error: stripeError, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
         payment_method: {
           card: elements.getElement(CardElement),
@@ -56,7 +56,7 @@ function CheckoutForm({ commandeId, total, onSuccess }) {
       }
 
       if (paymentIntent.status === 'succeeded') {
-        // Confirmar no backend
+        // Confirmer au backend
         await confirmPayment(paymentIntentId, commandeId)
         onSuccess()
       }
@@ -114,7 +114,7 @@ function CheckoutForm({ commandeId, total, onSuccess }) {
   )
 }
 
-// Component principal
+// Composant principal
 export default function Checkout() {
   const { items: cartItems, total: cartTotal, syncCart, clear } = useContext(CartContext)
   const { user } = useContext(AuthContext)
@@ -126,7 +126,7 @@ export default function Checkout() {
     mode: 'standard'
   })
 
-  // New state for direct checkout
+  // Nouvel état pour le paiement direct
   const [searchParams] = useSearchParams()
   const urlCommandeId = searchParams.get('commandeId')
   const [directItems, setDirectItems] = useState([])
@@ -134,7 +134,7 @@ export default function Checkout() {
 
   const nav = useNavigate()
 
-  // Determine which items/total to use
+  // Déterminer quels articles/total utiliser
   const displayItems = urlCommandeId ? directItems : cartItems
   const displayTotal = urlCommandeId ? directTotal : cartTotal
 
@@ -149,9 +149,9 @@ export default function Checkout() {
         try {
           setLoading(true)
           const data = await getCommandeById(urlCommandeId)
-          // Transform items to match display format if needed
+          // Transformer les articles pour correspondre au format d'affichage si nécessaire
           const mappedItems = data.items.map(i => ({
-            id: i.id, // or i.ouvrage_id depending on what we need
+            id: i.id, // ou i.ouvrage_id selon ce dont nous avons besoin
             title: i.titre,
             qty: i.quantite,
             price: Number(i.prix_unitaire)
@@ -177,15 +177,15 @@ export default function Checkout() {
       setError(null)
 
       if (urlCommandeId) {
-        // Direct checkout: just proceed to payment
+        // Paiement direct : procéder directement au paiement
         setCommandeId(urlCommandeId)
-        // TODO: Update order with address if API supported it
+        // TODO: Mettre à jour la commande avec l'adresse si l'API le supportait
       } else {
-        // Normal cart checkout
+        // Paiement normal du panier
         await syncCart()
         const res = await createCommande({})
         setCommandeId(res.commandeId)
-        // TODO: Update order with address and mode
+        // TODO: Mettre à jour la commande avec l'adresse et le mode
       }
     } catch (e) {
       setError(e?.response?.data?.message || 'Erreur lors de la création de la commande')
@@ -197,7 +197,7 @@ export default function Checkout() {
 
   const handlePaymentSuccess = () => {
     if (!urlCommandeId) {
-      clear() // Only clear cart if it was a cart checkout
+      clear() // Vider le panier seulement si c'était un paiement depuis le panier
     }
     nav('/commandes')
   }

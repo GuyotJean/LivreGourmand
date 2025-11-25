@@ -6,7 +6,8 @@ import {
   updateItem,
   removeItem,
 } from "../controllers/panier.controller.js";
-import { body, validationResult } from "express-validator";
+import { addItemValidator, updateItemValidator } from "../validators/validators.js";
+import { validationResult } from "express-validator";
 
 const router = express.Router();
 
@@ -24,6 +25,7 @@ router.get("/", verifyToken, getPanier);
 router.post(
   "/items",
   verifyToken,
+  addItemValidator,
   handleValidation,
   addItem
 );
@@ -32,6 +34,7 @@ router.post(
 router.put(
   "/items/:id",
   verifyToken,
+  updateItemValidator,
   handleValidation,
   updateItem
 );

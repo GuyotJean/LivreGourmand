@@ -11,6 +11,7 @@ import commandesRouter from './routes/commandes.routes.js';
 import ouvragesRouter from './routes/ouvrages.routes.js';
 import categoriesRouter from './routes/categories.routes.js';
 import listesRouter from './routes/listes.routes.js';
+import paymentRouter from './routes/payment.routes.js';
 
 dotenv.config();
 
@@ -22,11 +23,14 @@ app.use(helmet());
 // 🌐 CORS
 app.use(cors());
 
-// 📝 JSON parser
-app.use(express.json());
-
 // 🪵 Logger
 app.use(morgan('dev'));
+
+// Webhook do Stripe precisa de raw body (antes do express.json)
+app.use('/api/payment/webhook', express.raw({ type: 'application/json' }));
+
+// 📝 JSON parser (para todas as outras rotas)
+app.use(express.json());
 
 // 📌 Routes API
 app.use('/api/auth', authRouter);
@@ -36,6 +40,7 @@ app.use('/api/commandes', commandesRouter);
 app.use('/api/ouvrages', ouvragesRouter);
 app.use('/api/categories', categoriesRouter);
 app.use('/api/listes', listesRouter);
+app.use('/api/payment', paymentRouter);
 
 // ⚠️ 404
 app.use((req, res) => {

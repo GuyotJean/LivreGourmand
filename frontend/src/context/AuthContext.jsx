@@ -1,5 +1,5 @@
 import React, { createContext, useEffect, useState } from 'react'
-import { login as svcLogin, getMe } from '../services/authService'
+import { login as svcLogin, register as svcRegister, getMe } from '../services/authService'
 import api from '../api/axiosInstance'
 
 export const AuthContext = createContext()
@@ -50,13 +50,19 @@ export const AuthProvider = ({ children }) => {
     }
   }
 
+  const signup = async (nom, email, password) => {
+    await svcRegister(nom, email, password)
+    // After registration, automatically log in
+    await signin(email, password)
+  }
+
   const signout = () => {
     localStorage.removeItem('token')
     setUser(null)
   }
 
   return (
-    <AuthContext.Provider value={{ user, signin, signout, loading }}>
+    <AuthContext.Provider value={{ user, signin, signup, signout, loading }}>
       {children}
     </AuthContext.Provider>
   )

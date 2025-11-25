@@ -36,13 +36,16 @@ export const createCommande = async (req, res) => {
     );
     const commandeId = commandeResult.insertId;
 
-    // 4. Ajouter les lignes de commande
+    // 4. Ajouter les lignes de commande et calculer le total
+    let total = 0;
     for (const item of items) {
       const [ouvrageRows] = await db.query(
         `SELECT prix FROM ouvrages WHERE id = ?`,
         [item.ouvrage_id]
       );
       const prix = ouvrageRows[0]?.prix || 0;
+      const itemTotal = prix * item.quantite;
+      total += itemTotal;
 
       await db.query(
         `INSERT INTO commande_items (commande_id, ouvrage_id, quantite, prix_unitaire)
@@ -51,12 +54,14 @@ export const createCommande = async (req, res) => {
       );
     }
 
-    // 5. Vider le panier
-    await db.query(`DELETE FROM panier_items WHERE panier_id = ?`, [panierId]);
+    // 5. Mettre à jour le total de la commande
+    await db.query(
+      `UPDATE commandes SET total = ? WHERE id = ?`,
+      [total, commandeId]
+    );
 
-    // 6. Simuler une URL de paiement
-    const paymentUrl = `https://paiement.simulation.com/commande/${commandeId}`;
-    res.status(201).json({ message: "Commande créée", commandeId, paymentUrl });
+    // 6. Retourner la commande créée (não limpar o panier até o pagamento ser confirmado)
+    res.status(201).json({ message: "Commande créée", commandeId, total });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Erreur serveur" });

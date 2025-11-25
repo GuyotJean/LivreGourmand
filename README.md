@@ -222,5 +222,5 @@ Ce projet a été développé dans le cadre d'un projet académique.
 
 ## 👥 Auteurs
 
-- **Jean Guyot**
-- **Mauricio Oliveira**
+- **Jean Guyot** GitHub : @GuyotJean
+- **Mauricio Oliveira** GitHub : @maucasoli

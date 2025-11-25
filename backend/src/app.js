@@ -12,6 +12,7 @@ import ouvragesRouter from './routes/ouvrages.routes.js';
 import categoriesRouter from './routes/categories.routes.js';
 import listesRouter from './routes/listes.routes.js';
 import paymentRouter from './routes/payment.routes.js';
+import chatRouter from './routes/chat.routes.js';
 
 dotenv.config();
 
@@ -41,6 +42,7 @@ app.use('/api/ouvrages', ouvragesRouter);
 app.use('/api/categories', categoriesRouter);
 app.use('/api/listes', listesRouter);
 app.use('/api/payment', paymentRouter);
+app.use('/api/chat', chatRouter);
 
 // ⚠️ 404
 app.use((req, res) => {

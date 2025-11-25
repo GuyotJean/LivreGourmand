@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { getOuvrage } from '../services/ouvrageService'
+import { addAvis } from '../services/avisService'
 import { CartContext } from '../context/CartContext'
 import { AuthContext } from '../context/AuthContext'
 
@@ -9,6 +10,10 @@ export default function Product() {
   const [product, setProduct] = useState(null)
   const [loading, setLoading] = useState(true)
   const [quantity, setQuantity] = useState(1)
+  const [showAvisForm, setShowAvisForm] = useState(false)
+  const [avisNote, setAvisNote] = useState(5)
+  const [avisCommentaire, setAvisCommentaire] = useState('')
+  const [submittingAvis, setSubmittingAvis] = useState(false)
   const { addItem } = useContext(CartContext)
   const { user } = useContext(AuthContext)
 
@@ -50,6 +55,30 @@ export default function Product() {
       alert(`${quantity} exemplaire(s) ajouté(s) au panier`)
     } else {
       alert('Quantité invalide')
+    }
+  }
+
+  const handleSubmitAvis = async (e) => {
+    e.preventDefault()
+    if (!user) {
+      alert('Vous devez être connecté pour laisser un avis')
+      return
+    }
+    
+    try {
+      setSubmittingAvis(true)
+      await addAvis(id, avisNote, avisCommentaire)
+      alert('Avis ajouté avec succès!')
+      setShowAvisForm(false)
+      setAvisNote(5)
+      setAvisCommentaire('')
+      // Recharger les données du produit pour voir le nouvel avis
+      const data = await getOuvrage(id)
+      setProduct(data)
+    } catch (err) {
+      alert(err?.response?.data?.message || 'Erreur lors de l\'ajout de l\'avis')
+    } finally {
+      setSubmittingAvis(false)
     }
   }
 
@@ -100,7 +129,7 @@ export default function Product() {
                   )}
                   <tr>
                     <td><strong>Prix:</strong></td>
-                    <td><h4 className="text-primary mb-0">{Number(product.prix ?? 0).toFixed(2)} €</h4></td>
+                    <td><h4 className="text-primary mb-0">{Number(product.prix ?? 0).toFixed(2)} $</h4></td>
                   </tr>
                   <tr>
                     <td><strong>Stock:</strong></td>
@@ -151,9 +180,62 @@ export default function Product() {
           </div>
 
           {/* Avis */}
-          {avis.length > 0 && (
-            <div className="mt-4">
+          <div className="mt-4">
+            <div className="d-flex justify-content-between align-items-center mb-3">
               <h5>Avis des utilisateurs ({avis.length})</h5>
+              {user && (
+                <button 
+                  className="btn btn-sm btn-outline-primary"
+                  onClick={() => setShowAvisForm(!showAvisForm)}
+                >
+                  {showAvisForm ? 'Annuler' : 'Ajouter un avis'}
+                </button>
+              )}
+            </div>
+            
+            {showAvisForm && user && (
+              <div className="card mb-3">
+                <div className="card-body">
+                  <h6>Votre avis</h6>
+                  <form onSubmit={handleSubmitAvis}>
+                    <div className="mb-3">
+                      <label className="form-label">Note (1-5)</label>
+                      <select
+                        className="form-select"
+                        value={avisNote}
+                        onChange={(e) => setAvisNote(Number(e.target.value))}
+                        required
+                      >
+                        <option value={1}>1 - Très mauvais</option>
+                        <option value={2}>2 - Mauvais</option>
+                        <option value={3}>3 - Moyen</option>
+                        <option value={4}>4 - Bon</option>
+                        <option value={5}>5 - Excellent</option>
+                      </select>
+                    </div>
+                    <div className="mb-3">
+                      <label className="form-label">Commentaire</label>
+                      <textarea
+                        className="form-control"
+                        rows="3"
+                        value={avisCommentaire}
+                        onChange={(e) => setAvisCommentaire(e.target.value)}
+                        placeholder="Votre commentaire (optionnel)"
+                      />
+                    </div>
+                    <button 
+                      type="submit" 
+                      className="btn btn-primary"
+                      disabled={submittingAvis}
+                    >
+                      {submittingAvis ? 'Enregistrement...' : 'Enregistrer votre avis'}
+                    </button>
+                  </form>
+                </div>
+              </div>
+            )}
+            
+            {avis.length > 0 ? (
               <div className="list-group">
                 {avis.map(a => (
                   <div key={a.id} className="list-group-item">
@@ -172,10 +254,12 @@ export default function Product() {
                   </div>
                 ))}
               </div>
-            </div>
-          )}
+            ) : (
+              <p className="text-muted">Aucun avis pour le moment.</p>
+            )}
+          </div>
 
-          {/* Commentaires - se existir no backend */}
+          {/* Commentaires - s'ils existent dans le backend */}
           {product.commentaires && product.commentaires.length > 0 && (
             <div className="mt-4">
               <h5>Commentaires ({product.commentaires.length})</h5>

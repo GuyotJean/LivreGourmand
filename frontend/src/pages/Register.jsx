@@ -5,19 +5,35 @@ import { AuthContext } from '../context/AuthContext'
 export default function Register() {
   const { signup } = useContext(AuthContext)
   const [nom, setNom] = useState('')
+  const [prenom, setPrenom] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
   const nav = useNavigate()
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    setError('')
+    
+    // Valider que les mots de passe correspondent
+    if (password !== confirmPassword) {
+      setError('Les mots de passe ne correspondent pas')
+      return
+    }
+    
+    if (password.length < 6) {
+      setError('Le mot de passe doit contenir au moins 6 caractères')
+      return
+    }
+    
     try {
       setLoading(true)
-      await signup(nom, email, password)
+      await signup(nom, prenom, email, password)
       nav('/')
     } catch (err) {
-      alert(err?.response?.data?.message || 'Registration failed')
+      setError(err?.response?.data?.message || 'Erreur lors de l\'enregistrement')
     } finally {
       setLoading(false)
     }
@@ -30,13 +46,28 @@ export default function Register() {
           <h2 className="mb-4">Enregistrement sur le site</h2>
           <p className="text-muted mb-3">(champs obligatoires avec astérisque *)</p>
           <form onSubmit={handleSubmit} className="card p-4">
+            {error && (
+              <div className="alert alert-danger" role="alert">
+                {error}
+              </div>
+            )}
             <div className="mb-3">
               <label className="form-label">Nom (*)</label>
               <input 
                 className="form-control" 
                 value={nom} 
                 onChange={e => setNom(e.target.value)} 
-                placeholder="Votre nom"
+                placeholder="Votre nom de famille"
+                required 
+              />
+            </div>
+            <div className="mb-3">
+              <label className="form-label">Prénom (*)</label>
+              <input 
+                className="form-control" 
+                value={prenom} 
+                onChange={e => setPrenom(e.target.value)} 
+                placeholder="Votre prénom"
                 required 
               />
             </div>
@@ -60,6 +91,19 @@ export default function Register() {
                 onChange={e => setPassword(e.target.value)} 
                 placeholder="Minimum 6 caractères"
                 required 
+                minLength={6}
+              />
+            </div>
+            <div className="mb-3">
+              <label className="form-label">Confirmer le mot de passe (*)</label>
+              <input 
+                type="password" 
+                className="form-control" 
+                value={confirmPassword} 
+                onChange={e => setConfirmPassword(e.target.value)} 
+                placeholder="Répétez le mot de passe"
+                required 
+                minLength={6}
               />
             </div>
             <button className="btn btn-primary w-100" type="submit" disabled={loading}>

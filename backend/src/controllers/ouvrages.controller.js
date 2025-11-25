@@ -5,7 +5,7 @@ import db from "../db.js";
  */
 export const getOuvrages = async (req, res) => {
   try {
-    const { search, categorie, order } = req.query;
+    const { search, titre, auteur, isbn, categorie, order } = req.query;
 
     let query = `
       SELECT o.*, 
@@ -14,14 +14,31 @@ export const getOuvrages = async (req, res) => {
       FROM ouvrages o
       LEFT JOIN avis a ON a.ouvrage_id = o.id
     `;
-    let conditions = ["o.stock > 0"]; // Verificação de stock > 0
+    let conditions = [];
     let params = [];
 
+    // Recherche simple (search) - dans titre, auteur et ISBN uniquement
     if (search) {
       conditions.push(
-        `(o.titre LIKE ? OR o.auteur LIKE ? OR o.description LIKE ?)`
+        `(o.titre LIKE ? OR o.auteur LIKE ? OR o.isbn LIKE ?)`
       );
       params.push(`%${search}%`, `%${search}%`, `%${search}%`);
+    }
+
+    // Recherche avancée - chaque champ dans son propre champ
+    if (titre) {
+      conditions.push(`o.titre LIKE ?`);
+      params.push(`%${titre}%`);
+    }
+
+    if (auteur) {
+      conditions.push(`o.auteur LIKE ?`);
+      params.push(`%${auteur}%`);
+    }
+
+    if (isbn) {
+      conditions.push(`o.isbn LIKE ?`);
+      params.push(`%${isbn}%`);
     }
 
     if (categorie) {
@@ -29,14 +46,14 @@ export const getOuvrages = async (req, res) => {
       params.push(categorie);
     }
 
-    // Adiciona condições ao WHERE
+    // Ajouter les conditions au WHERE
     if (conditions.length > 0) {
       query += ` WHERE ` + conditions.join(" AND ");
     }
 
     query += ` GROUP BY o.id`;
 
-    // Ordenação
+    // Tri des résultats
     if (order === "popularite") {
       query += ` ORDER BY nb_avis DESC`;
     } else {

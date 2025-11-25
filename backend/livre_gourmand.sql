@@ -151,6 +151,7 @@ CREATE TABLE `ouvrages` (
   `auteur` varchar(255) DEFAULT NULL,
   `isbn` varchar(50) DEFAULT NULL,
   `description` text DEFAULT NULL,
+  `image` varchar(500) DEFAULT NULL,
   `prix` decimal(10,2) NOT NULL DEFAULT 0.00 CHECK (`prix` >= 0),
   `stock` int(11) NOT NULL DEFAULT 0 CHECK (`stock` >= 0),
   `categorie_id` int(11) DEFAULT NULL,
@@ -469,16 +470,16 @@ ALTER TABLE `payments`
 -- --------------------------------------------------------
 
 INSERT INTO categories (nom, description) VALUES
-('Littérature classique', 'Livres classiques de la littérature mondiale'),
-('Science-fiction', 'Romans de science-fiction et dystopie'),
-('Jeunesse', 'Livres pour enfants et adolescents');
+('Cuisine française', 'Livres de cuisine traditionnelle et moderne française'),
+('Pâtisserie', 'Recettes de desserts, gâteaux et pâtisseries'),
+('Cuisine internationale', 'Recettes et techniques culinaires du monde entier');
 
-INSERT INTO ouvrages (titre, auteur, isbn, description, prix, stock, categorie_id) VALUES
-('Le Petit Prince', 'Antoine de Saint-Exupéry', '9782070612758', 'Un conte poétique et philosophique pour tous les âges.', 12.99, 50, 1),
-('1984', 'George Orwell', '9780451524935', 'Un roman dystopique sur la surveillance et le totalitarisme.', 15.50, 30, 2),
-('Harry Potter à l''école des sorciers', 'J.K. Rowling', '9780747532743', 'Le premier tome des aventures de Harry Potter.', 20.00, 100, 3),
-('Le Comte de Monte-Cristo', 'Alexandre Dumas', '9782070409349', 'Une histoire de vengeance et de justice.', 18.75, 25, 2),
-('La Peste', 'Albert Camus', '9782070360427', 'Roman philosophique sur la condition humaine.', 14.20, 40, 2);
+INSERT INTO ouvrages (titre, auteur, isbn, description, image, prix, stock, categorie_id) VALUES
+('Le Grand Livre de la Cuisine Française', 'Alain Ducasse', '9782081502954', 'Un ouvrage complet sur la cuisine française avec plus de 200 recettes classiques et modernes.', 'https://m.media-amazon.com/images/I/71kx-GjXKQL._SL1500_.jpg', 45.99, 30, 1),
+('Larousse Gastronomique', 'Collectif', '9782035950068', 'L''encyclopédie de référence de la gastronomie française et internationale.', 'https://m.media-amazon.com/images/I/71V0di0phnL._SL1500_.jpg', 89.50, 20, 1),
+('Pâtisserie: Techniques et Recettes', 'Pierre Hermé', '9782081502955', 'Les secrets de la pâtisserie française par le célèbre pâtissier Pierre Hermé.', 'https://m.media-amazon.com/images/I/71AhluHklUL._SL1500_.jpg', 52.00, 25, 2),
+('The French Laundry Cookbook', 'Thomas Keller', '9781579651768', 'Recettes et techniques du restaurant étoilé The French Laundry en Californie.', 'https://m.media-amazon.com/images/I/81qZv+kT1bL._SL1500_.jpg', 65.75, 15, 3),
+('Ottolenghi Simple', 'Yotam Ottolenghi', '9781785031165', 'Recettes simples et délicieuses de la cuisine méditerranéenne et du Moyen-Orient.', 'https://m.media-amazon.com/images/I/811lEotm8oL._SL1500_.jpg', 38.20, 40, 3);
 
 COMMIT;
 

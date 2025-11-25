@@ -11,14 +11,35 @@ export default function Home() {
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
 
+  // Charger les catégories une seule fois
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const categoriesData = await listCategories();
+        if (Array.isArray(categoriesData)) {
+          setCategories(categoriesData);
+        }
+      } catch (e) {
+        console.error("Erreur chargement catégories:", e);
+      }
+    };
+    fetchCategories();
+  }, []);
+
+  // Recherche avec debounce pour éviter trop de requêtes
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const [productsData, categoriesData] = await Promise.all([
-          listOuvrages({ search, categorie: selectedCategory || undefined }),
-          listCategories()
-        ]);
+        const params = {};
+        if (search && search.trim()) {
+          params.search = search.trim();
+        }
+        if (selectedCategory) {
+          params.categorie = selectedCategory;
+        }
+        
+        const productsData = await listOuvrages(params);
 
         if (Array.isArray(productsData)) {
           setProducts(productsData);
@@ -27,22 +48,20 @@ export default function Home() {
         } else {
           setProducts([]);
         }
-
-        if (Array.isArray(categoriesData)) {
-          setCategories(categoriesData);
-        } else {
-          setCategories([]);
-        }
       } catch (e) {
-        console.error("Error fetching data:", e);
+        console.error("Erreur recherche:", e);
         setProducts([]);
-        setCategories([]);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchData();
+    // Debounce: attendre 500ms après la dernière frappe
+    const timeoutId = setTimeout(() => {
+      fetchData();
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
   }, [search, selectedCategory]);
 
   return (
@@ -79,10 +98,10 @@ export default function Home() {
           <h5 className="card-title">Recherche simple</h5>
           <div className="row g-3">
             <div className="col-md-6">
-              <label className="form-label">Mot clé</label>
+              <label className="form-label">Titre, auteur ou ISBN</label>
               <input
                 className="form-control"
-                placeholder="Titre, auteur, description..."
+                placeholder="Rechercher par titre, auteur ou ISBN..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />

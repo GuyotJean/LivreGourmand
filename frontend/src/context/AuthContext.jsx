@@ -19,18 +19,18 @@ export const AuthProvider = ({ children }) => {
     }
   }, [user])
 
-  // initialize user from token if present
+  // Initialiser l'utilisateur à partir du token s'il est présent
   useEffect(() => {
     const token = localStorage.getItem('token')
     if (token && !user) {
-      // try fetch /users/me
+      // Essayer de récupérer /users/me
       (async () => {
         try {
           setLoading(true)
           const me = await getMe()
           setUser(me)
         } catch (e) {
-          // token invalid
+          // Token invalide
           localStorage.removeItem('token')
           setUser(null)
         } finally {
@@ -41,18 +41,18 @@ export const AuthProvider = ({ children }) => {
   }, [])
 
   const signin = async (email, password) => {
-    const data = await svcLogin(email, password) // { token }
+    const data = await svcLogin(email, password) // { token } selon votre contrôleur
     if (data.token) {
       localStorage.setItem('token', data.token)
-      // fetch profile
+      // Récupérer le profil
       const me = await getMe()
       setUser(me)
     }
   }
 
-  const signup = async (nom, email, password) => {
-    await svcRegister(nom, email, password)
-    // After registration, automatically log in
+  const signup = async (nom, prenom, email, password) => {
+    await svcRegister(nom, prenom, email, password)
+    // Après l'enregistrement, connexion automatique
     await signin(email, password)
   }
 

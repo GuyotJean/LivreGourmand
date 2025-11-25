@@ -7,9 +7,11 @@ dotenv.config();
 // REGISTER
 export const register = async (req, res) => {
   try {
-    const { nom, email, password } = req.body;
+    const { nom, prenom, email, password } = req.body;
     if (!email || !password)
       return res.status(400).json({ message: 'Email et mot de passe requis' });
+    if (!nom || !prenom)
+      return res.status(400).json({ message: 'Nom et prénom requis' });
 
     // Vérifier si email déjà utilisé
     const [rows] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
@@ -17,9 +19,11 @@ export const register = async (req, res) => {
       return res.status(400).json({ message: 'Email déjà utilisé' });
 
     const hash = await bcrypt.hash(password, 10);
+    // Combinar nom e prenom no campo nom (já que a tabela só tem nom)
+    const nomComplet = `${prenom} ${nom}`.trim();
     await db.query(
       'INSERT INTO users (nom, email, password_hash) VALUES (?, ?, ?)',
-      [nom, email, hash]
+      [nomComplet, email, hash]
     );
 
     res.status(201).json({ message: 'Utilisateur créé avec succès' });

@@ -102,7 +102,7 @@ function CheckoutForm({ commandeId, total, onSuccess }) {
         type="submit"
         disabled={!stripe || loading}
       >
-        {loading ? 'Traitement en cours...' : `Payer ${total.toFixed(2)} €`}
+        {loading ? 'Traitement en cours...' : `Payer ${total.toFixed(2)} $`}
       </button>
       <p className="text-muted mt-3 small">
         <strong>Mode test:</strong> Utilisez la carte 4242 4242 4242 4242, n'importe quelle date future, n'importe quel CVC
@@ -210,12 +210,12 @@ export default function Checkout() {
                       {items.map(item => (
                         <li key={item.id} className="list-group-item d-flex justify-content-between">
                           <span>{item.title} x {item.qty}</span>
-                          <strong>{(item.price * item.qty).toFixed(2)} €</strong>
+                          <strong>{(item.price * item.qty).toFixed(2)} $</strong>
                         </li>
                       ))}
                       <li className="list-group-item d-flex justify-content-between">
                         <strong>Total TTC:</strong>
-                        <strong className="text-primary fs-5">{total.toFixed(2)} €</strong>
+                        <strong className="text-primary fs-5">{total.toFixed(2)} $</strong>
                       </li>
                     </ul>
                   </div>
@@ -254,7 +254,7 @@ export default function Checkout() {
           <h2 className="mb-4">Règlement</h2>
           <div className="card p-4">
             <div className="mb-3">
-              <h5>Total à payer: <strong className="text-primary">{total.toFixed(2)} €</strong></h5>
+              <h5>Total à payer: <strong className="text-primary">{total.toFixed(2)} $</strong></h5>
             </div>
             <div className="mb-3">
               <p className="text-muted">Sélectionnez votre mode de paiement</p>

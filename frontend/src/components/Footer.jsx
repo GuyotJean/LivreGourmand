@@ -8,26 +8,47 @@ export default function Footer() {
           <div className="col-md-6">
             <h6>Informations</h6>
             <ul className="list-unstyled">
-              <li><a href="#" className="text-decoration-none text-muted">À propos</a></li>
-              <li><a href="#" className="text-decoration-none text-muted">Conditions générales</a></li>
-              <li><a href="#" className="text-decoration-none text-muted">Politique de confidentialité</a></li>
-              <li><a href="#" className="text-decoration-none text-muted">Mentions légales</a></li>
+              <li>
+                <a href="#" className="text-decoration-none text-muted">
+                  À propos
+                </a>
+              </li>
+              <li>
+                <a href="#" className="text-decoration-none text-muted">
+                  Conditions générales
+                </a>
+              </li>
+              <li>
+                <a href="#" className="text-decoration-none text-muted">
+                  Politique de confidentialité
+                </a>
+              </li>
+              <li>
+                <a href="#" className="text-decoration-none text-muted">
+                  Mentions légales
+                </a>
+              </li>
             </ul>
           </div>
           <div className="col-md-6">
             <h6>Contacts</h6>
             <ul className="list-unstyled">
               <li className="text-muted">Email: contact@livresgourmands.net</li>
-              <li className="text-muted">Téléphone: +33 1 23 45 67 89</li>
-              <li className="text-muted">Adresse: 123 Rue des Livres, 75001 Paris</li>
+              <li className="text-muted">Téléphone: +1 866-345-6053</li>
+              <li className="text-muted">
+                Adresse: 220 Av. Fairmount O, Montréal, QC H2T 2M7
+              </li>
             </ul>
           </div>
         </div>
         <hr />
         <div className="text-center">
-          <small className="text-muted">© {new Date().getFullYear()} LivresGourmands.net - Tous droits réservés</small>
+          <small className="text-muted">
+            © {new Date().getFullYear()} LivresGourmands.net - Tous droits
+            réservés
+          </small>
         </div>
       </div>
     </footer>
-  )
+  );
 }

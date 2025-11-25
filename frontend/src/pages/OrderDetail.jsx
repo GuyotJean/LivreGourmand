@@ -37,7 +37,7 @@ export default function OrderDetail() {
         {items.map(it => (
           <li key={it.id} className="list-group-item d-flex justify-content-between">
             <div>{it.titre || it.title}</div>
-            <div>{it.quantite} × {Number(it.prix_unitaire ?? it.price ?? 0).toFixed(2)} €</div>
+            <div>{it.quantite} × {Number(it.prix_unitaire ?? it.price ?? 0).toFixed(2)} $</div>
           </li>
         ))}
       </ul>

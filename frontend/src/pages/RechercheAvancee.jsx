@@ -39,24 +39,48 @@ export default function RechercheAvancee() {
   const handleSearch = async () => {
     try {
       setLoading(true);
+      // Construire les paramètres de recherche - chaque champ dans son propre champ
       const params = {};
-      if (filters.titre) params.search = filters.titre;
-      if (filters.auteur) params.auteur = filters.auteur;
-      if (filters.isbn) params.isbn = filters.isbn;
-      if (filters.categorie_id) params.categorie = filters.categorie_id;
-      if (filters.prix_min) params.prix_min = filters.prix_min;
-      if (filters.prix_max) params.prix_max = filters.prix_max;
-
-      const data = await listOuvrages(params);
-      if (Array.isArray(data)) {
-        setProducts(data);
-      } else if (data && Array.isArray(data.ouvrages)) {
-        setProducts(data.ouvrages);
-      } else {
-        setProducts([]);
+      
+      if (filters.titre && filters.titre.trim()) {
+        params.titre = filters.titre.trim();
       }
+      
+      if (filters.auteur && filters.auteur.trim()) {
+        params.auteur = filters.auteur.trim();
+      }
+      
+      if (filters.isbn && filters.isbn.trim()) {
+        params.isbn = filters.isbn.trim();
+      }
+      
+      if (filters.categorie_id) {
+        params.categorie = filters.categorie_id;
+      }
+      
+      // Récupérer les ouvrages correspondants
+      const data = await listOuvrages(params);
+      let results = Array.isArray(data) ? data : (data?.ouvrages || []);
+      
+      // Filtrer par prix minimum si fourni (filtrage côté frontend)
+      if (filters.prix_min && filters.prix_min.trim()) {
+        const prixMin = Number(filters.prix_min);
+        if (!isNaN(prixMin)) {
+          results = results.filter(p => Number(p.prix || 0) >= prixMin);
+        }
+      }
+      
+      // Filtrer par prix maximum si fourni (filtrage côté frontend)
+      if (filters.prix_max && filters.prix_max.trim()) {
+        const prixMax = Number(filters.prix_max);
+        if (!isNaN(prixMax)) {
+          results = results.filter(p => Number(p.prix || 0) <= prixMax);
+        }
+      }
+      
+      setProducts(results);
     } catch (e) {
-      console.error("Error searching:", e);
+      console.error("Erreur recherche:", e);
       setProducts([]);
     } finally {
       setLoading(false);
@@ -113,7 +137,7 @@ export default function RechercheAvancee() {
               </select>
             </div>
             <div className="col-md-6">
-              <label className="form-label">Prix minimum (€)</label>
+              <label className="form-label">Prix minimum ($)</label>
               <input
                 type="number"
                 step="0.01"
@@ -123,7 +147,7 @@ export default function RechercheAvancee() {
               />
             </div>
             <div className="col-md-6">
-              <label className="form-label">Prix maximum (€)</label>
+              <label className="form-label">Prix maximum ($)</label>
               <input
                 type="number"
                 step="0.01"
@@ -137,8 +161,21 @@ export default function RechercheAvancee() {
             <button className="btn btn-primary" onClick={handleSearch} disabled={loading}>
               {loading ? "Recherche..." : "Rechercher"}
             </button>
-            <button className="btn btn-outline-secondary ms-2" onClick={() => navigate("/")}>
-              Retour à l'accueil
+            <button 
+              className="btn btn-outline-secondary ms-2" 
+              onClick={() => {
+                setFilters({
+                  titre: "",
+                  auteur: "",
+                  isbn: "",
+                  categorie_id: "",
+                  prix_min: "",
+                  prix_max: "",
+                });
+                setProducts([]);
+              }}
+            >
+              Vider les champs
             </button>
           </div>
         </div>

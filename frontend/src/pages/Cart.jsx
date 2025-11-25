@@ -58,7 +58,7 @@ export default function Cart() {
                       />
                     </td>
                     <td>
-                      <strong>{(i.price * i.qty).toFixed(2)} €</strong>
+                      <strong>{(i.price * i.qty).toFixed(2)} $</strong>
                     </td>
                     <td>
                       <button 
@@ -74,7 +74,7 @@ export default function Cart() {
               <tfoot>
                 <tr>
                   <td colSpan="2" className="text-end"><strong>Total TTC</strong></td>
-                  <td colSpan="2"><strong>{total.toFixed(2)} €</strong></td>
+                  <td colSpan="2"><strong>{total.toFixed(2)} $</strong></td>
                 </tr>
               </tfoot>
             </table>
@@ -84,7 +84,7 @@ export default function Cart() {
         <div className="col-md-4">
           <div className="card p-3">
             <h5>Résumé</h5>
-            <p className="mb-2">Total TTC: <strong className="text-primary fs-4">{total.toFixed(2)} €</strong></p>
+            <p className="mb-2">Total TTC: <strong className="text-primary fs-4">{total.toFixed(2)} $</strong></p>
             <button 
               className="btn btn-success w-100 btn-lg" 
               onClick={() => nav('/checkout')}

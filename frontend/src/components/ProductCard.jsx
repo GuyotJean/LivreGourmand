@@ -9,7 +9,7 @@ export default function ProductCard({ product }) {
         <h5 className="card-title">{product.titre || product.title}</h5>
         <p className="card-text text-muted">{product.auteur || product.author}</p>
         <div className="mt-auto d-flex justify-content-between align-items-center">
-          <strong>{Number(product.prix ?? product.price ?? 0).toFixed(2)} €</strong>
+          <strong>{Number(product.prix ?? product.price ?? 0).toFixed(2)} $</strong>
           <Link to={`/ouvrages/${product.id}`} className="btn btn-sm btn-outline-primary">Details</Link>
         </div>
       </div>

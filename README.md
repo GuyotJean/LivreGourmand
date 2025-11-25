@@ -1,25 +1,226 @@
 # LivreGourmand
-Projet : livresgourmands
-Date : 10 septembre 2025
 
-Brève description :
-livresgourmands est une plateforme de commerce électronique spécialisée dans la vente de livres de cuisine.
-Elle permet aux internautes de rechercher et consulter des ouvrages, aux clients de gérer un panier, passer des commandes,
-laisser des avis/commentaires et créer des listes de cadeaux. Le back-office permet aux éditeurs, gestionnaires et
-administrateurs de gérer le contenu, le catalogue, le stock et les utilisateurs. Un prestataire externe gère les paiements sécurisés.
+## 📖 Description
 
-**Objectifs de la semaine (Semaine 3) :**
-Créer le dépôt GitHub et faire le commit initial.
-Rédiger le README avec la description du projet.
-Produire le diagramme de cas d’utilisation (principaux acteurs).
-Produire une première ébauche du diagramme de classes UML.
-Déposer les diagrammes exportés sur le dépôt.
+**LivreGourmand** est une plateforme de commerce électronique spécialisée dans la vente de livres de cuisine. Elle offre une expérience complète aux internautes pour rechercher, consulter et acheter des ouvrages culinaires, avec des fonctionnalités avancées de gestion de panier, commandes, avis et listes de cadeaux.
 
-Répartition des rôles :
-**Jean Guyot** : Préparation du diagramme de cas d’utilisation et mise en page du README.
-**Mauricio Oliveira** : Conception du diagramme de classes et validation des associations.
-(Tous : validation finale et dépôt sur GitHub).
+### Fonctionnalités principales
 
-Membres de l’équipe :
-**Jean Guyot**
-**Mauricio Oliveira**
+- 🔍 **Recherche avancée** : Recherche par titre, auteur, ISBN, catégorie et prix
+- 🛒 **Gestion du panier** : Ajout, modification et suppression d'articles
+- 💳 **Paiement sécurisé** : Intégration Stripe pour les paiements en ligne (CAD)
+- ⭐ **Système d'avis** : Les clients peuvent laisser des avis et des notes sur les livres achetés
+- 📋 **Listes de cadeaux** : Création et gestion de listes de souhaits
+- 👥 **Gestion des utilisateurs** : Système d'authentification avec rôles (client, éditeur, gestionnaire, administrateur)
+- 📦 **Back-office** : Interface de gestion pour les éditeurs, gestionnaires et administrateurs
+
+## 🛠️ Technologies utilisées
+
+### Frontend
+- **React 18.2.0** - Bibliothèque JavaScript pour l'interface utilisateur
+- **React Router DOM 6.14.1** - Routage côté client
+- **Axios 1.5.0** - Client HTTP pour les requêtes API
+- **Bootstrap 5.3.2** - Framework CSS pour le design responsive
+- **Vite 5.2.0** - Outil de build et serveur de développement
+- **Stripe React** - Intégration Stripe pour les paiements
+
+### Backend
+- **Node.js** - Environnement d'exécution JavaScript
+- **Express 5.1.0** - Framework web pour Node.js
+- **MySQL2 3.15.2** - Driver MySQL pour Node.js
+- **JWT (jsonwebtoken 9.0.2)** - Authentification par tokens
+- **Bcrypt 6.0.0** - Hachage des mots de passe
+- **Stripe 20.0.0** - API de paiement
+- **Express Validator 7.3.1** - Validation des données
+- **Helmet 8.1.0** - Sécurisation des en-têtes HTTP
+- **Morgan 1.10.1** - Logger HTTP
+- **CORS 2.8.5** - Gestion des requêtes cross-origin
+
+### Base de données
+- **MySQL** - Système de gestion de base de données relationnelle
+
+## 📋 Prérequis
+
+Avant de commencer, assurez-vous d'avoir installé :
+
+- **Node.js** (version 18 ou supérieure)
+- **npm** (version 9 ou supérieure)
+- **MySQL** (version 8.0 ou supérieure)
+- **Git**
+
+## 🚀 Installation
+
+### 1. Cloner le dépôt
+
+```bash
+git clone https://github.com/GuyotJean/LivreGourmand.git
+cd LivreGourmand
+```
+
+### 2. Configuration de la base de données
+
+1. Créez une base de données MySQL :
+
+```sql
+CREATE DATABASE livre_gourmand CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
+
+2. Importez le schéma de la base de données :
+
+```bash
+cd backend
+mysql -u votre_utilisateur -p livre_gourmand < livre_gourmand.sql
+```
+
+### 3. Configuration du backend
+
+1. Naviguez vers le dossier backend :
+
+```bash
+cd backend
+```
+
+2. Installez les dépendances :
+
+```bash
+npm install
+```
+
+3. Créez un fichier `.env` à la racine du dossier `backend` :
+
+```env
+# Base de données
+DB_HOST=localhost
+DB_USER=votre_utilisateur_mysql
+DB_PASSWORD=votre_mot_de_passe_mysql
+DB_NAME=livre_gourmand
+
+# JWT
+JWT_SECRET=votre_secret_jwt_super_securise
+
+# Stripe
+STRIPE_SECRET_KEY=sk_test_votre_cle_secrete_stripe
+STRIPE_WEBHOOK_SECRET=whsec_votre_webhook_secret
+
+# Serveur
+PORT=3000
+NODE_ENV=development
+```
+
+### 4. Configuration du frontend
+
+1. Naviguez vers le dossier frontend :
+
+```bash
+cd frontend
+```
+
+2. Installez les dépendances :
+
+```bash
+npm install
+```
+
+3. Créez un fichier `.env` à la racine du dossier `frontend` :
+
+```env
+VITE_API_URL=http://localhost:3000/api
+VITE_STRIPE_PUBLIC_KEY=pk_test_votre_cle_publique_stripe
+```
+
+## ▶️ Démarrage
+
+### Démarrer le serveur backend
+
+```bash
+cd backend
+npm run dev
+```
+
+Le serveur backend sera accessible sur `http://localhost:3000`
+
+### Démarrer le serveur frontend
+
+Dans un nouveau terminal :
+
+```bash
+cd frontend
+npm run dev
+```
+
+Le serveur frontend sera accessible sur `http://localhost:5173` (ou le port indiqué par Vite)
+
+## 📁 Structure du projet
+
+```
+LivreGourmand/
+├── backend/                 # API Node.js/Express
+│   ├── src/
+│   │   ├── controllers/    # Contrôleurs pour chaque ressource
+│   │   ├── middlewares/     # Middlewares d'authentification et autorisation
+│   │   ├── routes/          # Définition des routes API
+│   │   ├── validators/      # Validation des données
+│   │   ├── db.js            # Configuration de la base de données
+│   │   ├── app.js           # Configuration Express
+│   │   └── server.js        # Point d'entrée du serveur
+│   ├── livre_gourmand.sql   # Schéma de la base de données
+│   └── package.json
+│
+├── frontend/                # Application React
+│   ├── src/
+│   │   ├── api/             # Configuration Axios
+│   │   ├── components/      # Composants réutilisables
+│   │   ├── context/         # Context API (Auth, Cart)
+│   │   ├── pages/           # Pages de l'application
+│   │   ├── services/        # Services API
+│   │   ├── App.jsx          # Composant principal
+│   │   └── main.jsx         # Point d'entrée
+│   └── package.json
+│
+└── README.md
+```
+
+## 🔐 Rôles et permissions
+
+L'application gère différents rôles avec des permissions spécifiques :
+
+- **Client** : Recherche, consultation, achat, avis, listes de cadeaux
+- **Éditeur** : Gestion de ses propres ouvrages
+- **Gestionnaire** : Gestion du catalogue, stock, commandes
+- **Administrateur** : Accès complet à toutes les fonctionnalités
+
+## 📝 Scripts disponibles
+
+### Backend
+
+- `npm run dev` - Démarre le serveur en mode développement avec nodemon
+- `npm start` - Démarre le serveur en mode production
+
+### Frontend
+
+- `npm run dev` - Démarre le serveur de développement Vite
+- `npm run build` - Compile l'application pour la production
+- `npm run preview` - Prévisualise la version de production
+
+## 🌐 API Endpoints
+
+Les principales routes de l'API sont :
+
+- `/api/auth` - Authentification (login, register)
+- `/api/ouvrages` - Gestion des ouvrages
+- `/api/panier` - Gestion du panier
+- `/api/commandes` - Gestion des commandes
+- `/api/payment` - Paiements Stripe
+- `/api/listes` - Listes de cadeaux
+- `/api/users` - Gestion des utilisateurs
+
+Pour plus de détails, consultez la collection Postman fournie dans `backend/LivreGourmand.postman_collection.json`.
+
+## 🤝 Contribution
+
+Ce projet a été développé dans le cadre d'un projet académique.
+
+## 👥 Auteurs
+
+- **Jean Guyot**
+- **Mauricio Oliveira**

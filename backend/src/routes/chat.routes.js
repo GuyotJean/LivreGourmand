@@ -24,12 +24,16 @@ router.post("/", handleValidation, async (req, res) => {
       body: JSON.stringify({
         model: "gpt-oss",
         prompt: message,
-        stream: false, // JSON
-        temperature: 0.1,
-        top_k: 45,
-        top_p: 0.92,
-        max_tokens: 150,
-        repetition_penalty: 1.1,
+        stream: false,
+        options: {
+          thinking: false,
+          reasoning: false,
+          num_predict: 150,
+          temperature: 0.1,
+          top_k: 45,
+          top_p: 0.92,
+          repeat_penalty: 1.1
+        }
       }),
     });
 

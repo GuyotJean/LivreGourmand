@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { listOuvrages } from "../services/ouvrageService";
 import { createListe } from "../services/listeService";
+import Swal from 'sweetalert2';
 
 export default function CreateList() {
     const [nom, setNom] = useState("");
@@ -55,7 +56,13 @@ export default function CreateList() {
 
         try {
             const res = await createListe({ nom, items });
-            alert(`Liste créée avec succès! Code: ${res.liste.code_partage}`);
+            await Swal.fire({
+                title: "Liste créée avec succès!",
+                html: `<p>Votre code de partage:</p><h3><strong>${res.liste.code_partage}</strong></h3>`,
+                icon: "success",
+                confirmButtonText: "OK",
+                confirmButtonColor: "#0056b3"
+            });
             navigate("/listes/access");
         } catch (e) {
             setError(e.response?.data?.message || "Erreur lors de la création de la liste");

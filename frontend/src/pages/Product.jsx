@@ -4,6 +4,7 @@ import { getOuvrage } from '../services/ouvrageService'
 import { addAvis } from '../services/avisService'
 import { CartContext } from '../context/CartContext'
 import { AuthContext } from '../context/AuthContext'
+import Swal from 'sweetalert2'
 
 export default function Product() {
   const { id } = useParams()
@@ -40,7 +41,7 @@ export default function Product() {
       </div>
     </div>
   )
-  
+
   if (!product) return <div className="container"><div className="alert alert-danger">Ouvrage non trouvé</div></div>
 
   // Calculer la moyenne des avis
@@ -52,7 +53,7 @@ export default function Product() {
   const handleAddToCart = () => {
     if (quantity > 0 && quantity <= product.stock) {
       addItem(product, quantity)
-      alert(`${quantity} exemplaire(s) ajouté(s) au panier`)
+      //alert(`${quantity} exemplaire(s) ajouté(s) au panier`)
     } else {
       alert('Quantité invalide')
     }
@@ -61,14 +62,26 @@ export default function Product() {
   const handleSubmitAvis = async (e) => {
     e.preventDefault()
     if (!user) {
-      alert('Vous devez être connecté pour laisser un avis')
+      Swal.fire({
+        icon: "error",
+        title: "Connexion requise",
+        text: "Vous devez être connecté pour laisser un avis",
+        confirmButtonText: "OK",
+        confirmButtonColor: "#0056b3"
+      })
       return
     }
-    
+
     try {
       setSubmittingAvis(true)
       await addAvis(id, avisNote, avisCommentaire)
-      alert('Avis ajouté avec succès!')
+      await Swal.fire({
+        icon: "success",
+        title: "Merci!",
+        text: "Votre avis a été ajouté avec succès!",
+        confirmButtonText: "OK",
+        confirmButtonColor: "#0056b3"
+      })
       setShowAvisForm(false)
       setAvisNote(5)
       setAvisCommentaire('')
@@ -76,7 +89,13 @@ export default function Product() {
       const data = await getOuvrage(id)
       setProduct(data)
     } catch (err) {
-      alert(err?.response?.data?.message || 'Erreur lors de l\'ajout de l\'avis')
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: err?.response?.data?.message || "Erreur lors de l'ajout de l'avis",
+        confirmButtonText: "OK",
+        confirmButtonColor: "#0056b3"
+      })
     } finally {
       setSubmittingAvis(false)
     }
@@ -85,33 +104,33 @@ export default function Product() {
   return (
     <div className="container">
       <h2 className="mb-4">Description d'un ouvrage</h2>
-      
+
       <div className="row g-4">
         <div className="col-md-5">
-          <img 
-            src={product.image || '/placeholder.png'} 
-            alt={product.titre} 
+          <img
+            src={product.image || '/placeholder.png'}
+            alt={product.titre}
             className="img-fluid rounded shadow"
             style={{ maxHeight: '500px', objectFit: 'cover', width: '100%' }}
           />
         </div>
-        
+
         <div className="col-md-7">
           <h1 className="mb-3">{product.titre}</h1>
-          
+
           {product.auteur && (
             <p className="text-muted mb-2"><strong>Auteur:</strong> {product.auteur}</p>
           )}
-          
+
           {product.categorie && (
             <p className="mb-2">
               <strong>Catégories:</strong> {product.categorie.nom || product.categorie}
             </p>
           )}
-          
+
           {moyenneAvis && (
             <div className="mb-3">
-              <strong>Avis moyen:</strong> {moyenneAvis}/5 
+              <strong>Avis moyen:</strong> {moyenneAvis}/5
               <span className="text-muted ms-2">({avis.length} avis)</span>
             </div>
           )}
@@ -184,7 +203,7 @@ export default function Product() {
             <div className="d-flex justify-content-between align-items-center mb-3">
               <h5>Avis des utilisateurs ({avis.length})</h5>
               {user && (
-                <button 
+                <button
                   className="btn btn-sm btn-outline-primary"
                   onClick={() => setShowAvisForm(!showAvisForm)}
                 >
@@ -192,7 +211,7 @@ export default function Product() {
                 </button>
               )}
             </div>
-            
+
             {showAvisForm && user && (
               <div className="card mb-3">
                 <div className="card-body">
@@ -223,8 +242,8 @@ export default function Product() {
                         placeholder="Votre commentaire (optionnel)"
                       />
                     </div>
-                    <button 
-                      type="submit" 
+                    <button
+                      type="submit"
                       className="btn btn-primary"
                       disabled={submittingAvis}
                     >
@@ -234,7 +253,7 @@ export default function Product() {
                 </div>
               </div>
             )}
-            
+
             {avis.length > 0 ? (
               <div className="list-group">
                 {avis.map(a => (

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { sendMessage as sendMessageAPI } from "../services/api";
+import { sendMessage as sendMessageAPI } from "../services/chatService";
 
 export default function ChatBox() {
   const [messages, setMessages] = useState([]);
@@ -235,7 +235,7 @@ export default function ChatBox() {
                     e.target.style.background = "#f8f9fa";
                   }}
                 >
-                  ↩️ Voltar ao menu
+                  ↩️ Back to menu
                 </button>
               </div>
             )}

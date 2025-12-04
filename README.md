@@ -10,7 +10,8 @@
 - 🛒 **Gestion du panier** : Ajout, modification et suppression d'articles
 - 💳 **Paiement sécurisé** : Intégration Stripe pour les paiements en ligne (CAD)
 - ⭐ **Système d'avis** : Les clients peuvent laisser des avis et des notes sur les livres achetés
-- 📋 **Listes de cadeaux** : Création et gestion de listes de souhaits
+- 📋 **Listes de cadeaux** : Création et gestion de listes de souhaits partageables
+- 💬 **Chatbot intelligent** : Assistant virtuel alimenté par IA (Ollama) pour répondre aux questions des clients
 - 👥 **Gestion des utilisateurs** : Système d'authentification avec rôles (client, éditeur, gestionnaire, administrateur)
 - 📦 **Back-office** : Interface de gestion pour les éditeurs, gestionnaires et administrateurs
 
@@ -35,6 +36,8 @@
 - **Helmet 8.1.0** - Sécurisation des en-têtes HTTP
 - **Morgan 1.10.1** - Logger HTTP
 - **CORS 2.8.5** - Gestion des requêtes cross-origin
+- **Ollama** - Serveur LLM local pour le chatbot IA
+- **node-fetch** - Client HTTP pour les requêtes au LLM
 
 ### Base de données
 - **MySQL** - Système de gestion de base de données relationnelle
@@ -47,6 +50,7 @@ Avant de commencer, assurez-vous d'avoir installé :
 - **npm** (version 9 ou supérieure)
 - **MySQL** (version 8.0 ou supérieure)
 - **Git**
+- **Ollama** (pour le chatbot IA) - [Installation](#-installation-dollama-optionnel)
 
 ## 🚀 Installation
 
@@ -86,7 +90,7 @@ cd backend
 npm install
 ```
 
-3. Créez un fichier `.env` à la racine du dossier `backend` :
+3. Créez un fichier `.env` à la racine du dossier `backend` (vous pouvez copier `.env.example`) :
 
 ```env
 # Base de données
@@ -101,6 +105,9 @@ JWT_SECRET=votre_secret_jwt_super_securise
 # Stripe
 STRIPE_SECRET_KEY=sk_test_votre_cle_secrete_stripe
 STRIPE_WEBHOOK_SECRET=whsec_votre_webhook_secret
+
+# LLM (Ollama) - Optionnel, pour le chatbot
+LLM_API_URL=http://localhost:11434/api/generate
 
 # Serveur
 PORT=3000
@@ -121,12 +128,45 @@ cd frontend
 npm install
 ```
 
-3. Créez un fichier `.env` à la racine du dossier `frontend` :
+3. Créez un fichier `.env` à la racine du dossier `frontend` (vous pouvez copier `.env.example`) :
 
 ```env
-VITE_API_URL=http://localhost:3000/api
+# API Backend
+VITE_API_BASE_URL=http://localhost:3000/api
+
+# Stripe
 VITE_STRIPE_PUBLIC_KEY=pk_test_votre_cle_publique_stripe
 ```
+
+### 5. Installation d'Ollama (Optionnel)
+
+Le chatbot utilise Ollama pour fournir des réponses intelligentes. Cette étape est optionnelle - sans Ollama, le chatbot ne fonctionnera pas, mais le reste de l'application fonctionnera normalement.
+
+#### Installation d'Ollama
+
+1. **Téléchargez et installez Ollama** :
+   - **Windows** : Téléchargez depuis [ollama.com/download](https://ollama.com/download)
+   - **macOS** : `brew install ollama` ou téléchargez depuis [ollama.com/download](https://ollama.com/download)
+   - **Linux** : `curl -fsSL https://ollama.com/install.sh | sh`
+
+2. **Démarrez le serveur Ollama** :
+   ```bash
+   ollama serve
+   ```
+
+3. **Téléchargez le modèle gpt-oss** :
+   Dans un nouveau terminal :
+   ```bash
+   ollama pull gpt-oss
+   ```
+
+4. **Vérifiez l'installation** :
+   ```bash
+   ollama list
+   ```
+   Vous devriez voir `gpt-oss` dans la liste des modèles.
+
+> **Note** : Le serveur Ollama doit être en cours d'exécution pour que le chatbot fonctionne. Par défaut, il écoute sur `http://localhost:11434`.
 
 ## ▶️ Démarrage
 
@@ -154,30 +194,37 @@ Le serveur frontend sera accessible sur `http://localhost:5173` (ou le port indi
 
 ```
 LivreGourmand/
-├── backend/                 # API Node.js/Express
+├── backend/                          # API Node.js/Express
 │   ├── src/
-│   │   ├── controllers/    # Contrôleurs pour chaque ressource
-│   │   ├── middlewares/     # Middlewares d'authentification et autorisation
-│   │   ├── routes/          # Définition des routes API
-│   │   ├── validators/      # Validation des données
-│   │   ├── db.js            # Configuration de la base de données
-│   │   ├── app.js           # Configuration Express
-│   │   └── server.js        # Point d'entrée du serveur
-│   ├── livre_gourmand.sql   # Schéma de la base de données
+│   │   ├── controllers/             # Contrôleurs pour chaque ressource
+│   │   ├── middlewares/             # Middlewares d'authentification et autorisation
+│   │   ├── routes/                  # Définition des routes API
+│   │   ├── validators/              # Validation des données
+│   │   ├── db.js                    # Configuration de la base de données
+│   │   ├── app.js                   # Configuration Express
+│   │   └── server.js                # Point d'entrée du serveur
+│   ├── docs/                        # Documentation (diagrammes E-R, UML, etc.)
+│   ├── livre_gourmand.sql           # Schéma de la base de données avec seeds
+│   ├── LivreGourmand.postman_collection.json  # Collection Postman pour tester l'API
+│   ├── .env.example                 # Exemple de configuration
 │   └── package.json
 │
-├── frontend/                # Application React
+├── frontend/                        # Application React
 │   ├── src/
-│   │   ├── api/             # Configuration Axios
-│   │   ├── components/      # Composants réutilisables
-│   │   ├── context/         # Context API (Auth, Cart)
-│   │   ├── pages/           # Pages de l'application
-│   │   ├── services/        # Services API
-│   │   ├── App.jsx          # Composant principal
-│   │   └── main.jsx         # Point d'entrée
+│   │   ├── api/                     # Configuration Axios
+│   │   ├── components/              # Composants réutilisables (ChatBox, etc.)
+│   │   ├── context/                 # Context API (Auth, Cart)
+│   │   ├── pages/                   # Pages de l'application
+│   │   ├── services/                # Services API (chatService, etc.)
+│   │   ├── App.jsx                  # Composant principal
+│   │   └── main.jsx                 # Point d'entrée
+│   ├── public/                      # Assets statiques (images, favicon)
+│   ├── .env.example                 # Exemple de configuration
+│   ├── index.html                   # Point d'entrée HTML
 │   └── package.json
 │
-└── README.md
+├── .gitignore                       # Fichiers à ignorer par Git
+└── README.md                        # Documentation du projet
 ```
 
 ## 🔐 Rôles et permissions
@@ -213,6 +260,7 @@ Les principales routes de l'API sont :
 - `/api/payment` - Paiements Stripe
 - `/api/listes` - Listes de cadeaux
 - `/api/users` - Gestion des utilisateurs
+- `/api/chat` - Chatbot IA (Ollama)
 
 Pour plus de détails, consultez la collection Postman fournie dans `backend/LivreGourmand.postman_collection.json`.
 

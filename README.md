@@ -4,6 +4,8 @@
 
 **LivreGourmand** est une plateforme de commerce électronique spécialisée dans la vente de livres de cuisine. Elle offre une expérience complète aux internautes pour rechercher, consulter et acheter des ouvrages culinaires, avec des fonctionnalités avancées de gestion de panier, commandes, avis et listes de cadeaux.
 
+![Home page](https://github.com/GuyotJean/LivreGourmand/blob/main/docs/home.png "Home page")
+
 ### Fonctionnalités principales
 
 - 🔍 **Recherche avancée** : Recherche par titre, auteur, ISBN, catégorie et prix
